@@ -1,21 +1,28 @@
 import { Octokit } from "octokit";
-export async function octoapi() {
-    const octokit = new Octokit({
-        auth: import.meta.env.GITHUB_TOKEN
-    })
 
+const octokit = new Octokit({
+    auth: import.meta.env.GITHUB_TOKEN
+})
+
+export const languageUse = async () => {
     try {
-        const result = await octokit.request("GET /repos/{owner}/{repo}/languages", {
+        const result = await octokit.request("GET /repos/{owner}/{repo}", {
             owner: "saurabhkumar96",
             repo: "mini_project",
         });
-
-        // const titleAndAuthor = result.data.map(issue => { title: issue.title, authorID: issue.user.id })
-
         console.log(result)
-
     } catch (error) {
         console.log(`Error! Status: ${error.status}. Message: ${error.response.data.message}`)
     }
+}
 
-}   
+export const showAllRepo = async () => {
+    try {
+        const result = await octokit.request("GET /users/{username}/repos", {
+            username: "saurabhkumar96"
+        })
+        return result.data
+    } catch (error) {
+        console.log(`Error! Status: ${error.status}. Message: ${error.response.data.message}`)
+    }
+}
