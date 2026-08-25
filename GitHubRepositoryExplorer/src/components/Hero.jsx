@@ -16,8 +16,10 @@ const Hero = () => {
             >
 
                 <TextField id="outlined-basic" label="Repository-Search" variant="outlined" />
-                <Button variant="contained">Contained</Button>
+                <Button variant="contained">Search</Button>
             </Box>
+
+            
         </div>
     )
 }
