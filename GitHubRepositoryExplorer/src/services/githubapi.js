@@ -18,7 +18,7 @@ export const languageUse = async () => {
     }
 }
 
-
+// not using this function 
 export const showAllRepo = async () => {
     try {
 
@@ -32,4 +32,14 @@ export const showAllRepo = async () => {
 }
 
 // make teh pagination
+export const fetchPerPageRepo = async (page,username)=>{
+    const perPage = 10
+
+    const response = await octokit.request("GET /users/{username}/repos", {
+        username: username,
+        page: page,
+        per_page:perPage
+    })
+    return response
+}
 

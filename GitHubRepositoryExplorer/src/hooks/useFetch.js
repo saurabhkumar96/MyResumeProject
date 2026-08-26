@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { showAllRepo } from "../services/githubapi";
+import { showAllRepo,fetchPerPageRepo } from "../services/githubapi";
 
 export function useGithubApi(){
     const getRepos = useCallback(async ()=>{
@@ -13,5 +13,15 @@ export function useGithubApi(){
             return []
         }
     },[])
-    return {getRepos}
+    const getPerPageRepo = async (page,username)=>{
+        try {
+            const res = await fetchPerPageRepo(page,username)
+            const arr = res.data.map((elem)=> elem.name)
+            return arr
+        } catch (error) {
+            console.log(`Error! ${error.message}`)
+        }
+    }
+    return {getRepos, getPerPageRepo}
 }
+

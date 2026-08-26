@@ -3,41 +3,112 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import { useEffect, useState } from 'react';
 import { useGithubApi } from '../hooks/useFetch';
+import { fetchPerPageRepo } from '../services/githubapi';
 
 const Hero = () => {
-    const { getRepos } = useGithubApi();
+    const { getPerPageRepo } = useGithubApi();
 
-    const [reponame, setReponame] = useState([]);
+    const [repoNames, setRepoNames] = useState([]);
+    const [username, setUsername] = useState('');
     const [search, setSearch] = useState('');
-    const [isLoading, setIsLoading] = useState(true)
-    const [error, setError] = useState(null)
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [current, setCurrent] = useState(1);
 
     useEffect(() => {
-        const getReposs = async () => {
+
+        let isMounted = true;
+
+        const fetchRepositories = async () => {
             try {
-                setIsLoading(true)
-                const res = await getRepos();
-                // if(!res.ok) throw new Error("Fail to fetch data")
-                setReponame(res);
-            } catch (error) {
-                setError(error.message)
+                setIsLoading(true);
+                setError(null);
+
+                const response = await getPerPageRepo(current,username);
+
+                if (isMounted) {
+                    setRepoNames(Array.isArray(response) ? response : []);
+                }
+            } catch (err) {
+                if (isMounted) {
+                    setError(
+                        err?.message || 'Failed to fetch repositories'
+                    );
+                    setRepoNames([]);
+                }
             } finally {
-                setIsLoading(false)
+                if (isMounted) {
+                    setIsLoading(false);
+                }
             }
         };
 
-        getReposs();
-    }, [getRepos]);
+        fetchRepositories();
 
-    const filteredRepos = reponame.filter((repo) =>
-        repo.toLowerCase().includes(search.toLowerCase())
+        return () => {
+            isMounted = false;
+        };
+
+    }, [current]);
+
+    const filteredRepos = repoNames.filter((repo) =>
+        String(repo).toLowerCase().includes(search.toLowerCase())
     );
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        console.log({
+            username,
+            search,
+        });
+
+        let isMounted = true;
+
+        const fetchRepositories = async () => {
+            try {
+                setIsLoading(true);
+                setError(null);
+
+                const response = await getPerPageRepo(current,username);
+
+                if (isMounted) {
+                    setRepoNames(Array.isArray(response) ? response : []);
+                }
+            } catch (err) {
+                if (isMounted) {
+                    setError(
+                        err?.message || 'Failed to fetch repositories'
+                    );
+                    setRepoNames([]);
+                }
+            } finally {
+                if (isMounted) {
+                    setIsLoading(false);
+                }
+            }
+        };
+
+        fetchRepositories();
+
+        return () => {
+            isMounted = false;
+        };
+    };
+
+    const handlePrevious = () => {
+        setCurrent((previous) => Math.max(previous - 1, 1));
+    };
+
+    const handleNext = () => {
+        setCurrent((previous) => previous + 1);
+    };
 
     return (
         <div>
             <Box
                 component="form"
-                onSubmit={(e) => e.preventDefault()}
+                onSubmit={handleSubmit}
                 sx={{
                     display: 'flex',
                     justifyContent: 'center',
@@ -47,48 +118,89 @@ const Hero = () => {
                 }}
             >
                 <TextField
-                    id="outlined-basic"
+                    id="username"
                     label="Username"
                     variant="outlined"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
                 />
+
                 <TextField
-                    id="outlined-basic"
-                    label="Repository-Search"
+                    id="repository-search"
+                    label="Repository Search"
                     variant="outlined"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                 />
 
-                <Button type="submit" variant="contained">
+                <Button type="submit" variant="contained" >
                     Search
                 </Button>
             </Box>
 
-            <div className="flex justify-center">
-                <table className="border-collapse border border-gray-400 w-2">
-                    <thead>
-                        <tr>
-                            <th className="border border-gray-400 px-4 py-2">
-                                Repository Name
-                            </th>
+            {error && (
+                <p className="text-center text-red-500">
+                    {error}
+                </p>
+            )}
 
-                        </tr>
-                    </thead>
+            <div className="flex justify-center items-center gap-4 my-4">
+                <Button
+                    type="button"
+                    variant="contained"
+                    onClick={handlePrevious}
+                    disabled={current === 1 || isLoading}
+                >
+                    Prev
+                </Button>
 
-                    <tbody>
-                        {filteredRepos.map((repo, index) => (
-                            <tr key={index}>
-                                <td className="border border-gray-400 px-4 py-2">
-                                    {repo}
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+                <span>Page {current}</span>
+
+                <Button
+                    type="button"
+                    variant="contained"
+                    onClick={handleNext}
+                    disabled={isLoading}
+                >
+                    Next
+                </Button>
             </div>
 
+            {isLoading ? (
+                <p className="text-center">
+                    Loading repositories...
+                </p>
+            ) : (
+                <div className="flex justify-center">
+                    <table className="border-collapse border border-gray-400">
+                        <thead>
+                            <tr>
+                                <th className="border border-gray-400 px-4 py-2">
+                                    Repository Name
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {filteredRepos.length > 0 ? (
+                                filteredRepos.map((repo, index) => (
+                                    <tr key={`${repo}-${index}`}>
+                                        <td className="border border-gray-400 px-4 py-2">
+                                            {repo}
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td className="border border-gray-400 px-4 py-2">
+                                        No repositories found
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+            )}
         </div>
     );
 };
