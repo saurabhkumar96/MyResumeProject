@@ -1,19 +1,21 @@
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useGithubApi } from '../hooks/useFetch';
-import { fetchPerPageRepo } from '../services/githubapi';
+import { Link } from 'react-router';
+
 
 const Hero = () => {
     const { getPerPageRepo } = useGithubApi();
 
     const [repoNames, setRepoNames] = useState([]);
-    const [username, setUsername] = useState('');
+    const [username, setUsername] = useState(() => { return localStorage.getItem('githubUsername') || ''; });
     const [search, setSearch] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
     const [current, setCurrent] = useState(1);
+
 
     useEffect(() => {
 
@@ -24,7 +26,7 @@ const Hero = () => {
                 setIsLoading(true);
                 setError(null);
 
-                const response = await getPerPageRepo(current,username);
+                const response = await getPerPageRepo(current, username);
 
                 if (isMounted) {
                     setRepoNames(Array.isArray(response) ? response : []);
@@ -49,7 +51,12 @@ const Hero = () => {
             isMounted = false;
         };
 
+
     }, [current]);
+    
+    useEffect(() => {
+        localStorage.setItem('githubUsername', username);
+    }, [username]);
 
     const filteredRepos = repoNames.filter((repo) =>
         String(repo).toLowerCase().includes(search.toLowerCase())
@@ -70,7 +77,7 @@ const Hero = () => {
                 setIsLoading(true);
                 setError(null);
 
-                const response = await getPerPageRepo(current,username);
+                const response = await getPerPageRepo(current, username);
 
                 if (isMounted) {
                     setRepoNames(Array.isArray(response) ? response : []);
@@ -186,7 +193,9 @@ const Hero = () => {
                                 filteredRepos.map((repo, index) => (
                                     <tr key={`${repo}-${index}`}>
                                         <td className="border border-gray-400 px-4 py-2">
-                                            {repo}
+                                            <Link to={`/repository/${repo}`}>{repo}</Link>
+                                            {console.log(repo)}
+
                                         </td>
                                     </tr>
                                 ))

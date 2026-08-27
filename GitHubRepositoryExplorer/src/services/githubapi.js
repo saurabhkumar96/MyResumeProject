@@ -1,10 +1,19 @@
-import { Octokit } from "octokit";
+import { Octokit } from "@octokit/rest";
+// import { Octokit } from "@octokit/rest";
+
+const secoctokit = new Octokit()
 
 const octokit = new Octokit({
     auth: import.meta.env.GITHUB_TOKEN
 })
 
-// const octokit = new Octokit({ })
+
+export async function checkRateLimit() {
+    const { data } = await octokit.rateLimit.get();
+    console.log(data.rate);
+}
+
+
 
 export const languageUse = async () => {
     try {
@@ -25,21 +34,49 @@ export const showAllRepo = async () => {
         const result = await octokit.request("GET /users/{username}/repos", {
             username: "saurabhkumar96",
         })
-        return result
+        return result.data
     } catch (error) {
         console.log(`Error! Status: ${error.status}. Message: ${error.response.data.message}`)
     }
 }
 
 // make teh pagination
-export const fetchPerPageRepo = async (page,username)=>{
+export const fetchPerPageRepo = async (page, username) => {
     const perPage = 10
 
     const response = await octokit.request("GET /users/{username}/repos", {
         username: username,
         page: page,
-        per_page:perPage
+        per_page: perPage,
+        sort: "stars",
     })
     return response
 }
 
+// search language repo
+export const searchRepoLanguage = async (repoName) => {
+    const response = await octokit.request("GET /repos/{owner}/{repo}/languages",{
+        owner:"saurabhkumar96",
+        repo:repoName
+    })
+    console.log(response)
+}
+
+
+export async function searchRepositories(language) {
+  try {
+    const response = await octokit.rest.search.repos({
+      // "q" contains your search terms and qualifiers like "language"
+      q: `language:${language}`, 
+      sort: "stars",
+      order: "desc",
+    });
+    console.log(`Found ${response.data.total_count} repositories.`);
+    
+    response.data.items.forEach(repo => {
+      console.log(`${repo.full_name} - ⭐ ${repo.stargazers_count}`);
+    });
+  } catch (error) {
+    console.error(`Error: ${error.message}`);
+  }
+}
