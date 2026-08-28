@@ -1,12 +1,14 @@
 import { Route, Routes } from "react-router"
 import Home from "./pages/Home"
 import { useEffect } from "react"
-import { totalLanguage } from "./hooks/findAllLanguages"
 import RepositoryDetail from "./components/RepositoryDetail"
+import { totalLanguage } from "./hooks/findAllLanguages"
+import { searchRepoLanguage } from "./services/githubapi"
 
 const App = () => {
-  useEffect(()=>{
-    // totalLanguage()
+  useEffect(async ()=>{
+    const res = await searchRepoLanguage("MyResumeProject")
+    console.log(data.data)
   },[])
   return (
     <>

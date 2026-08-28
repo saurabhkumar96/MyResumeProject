@@ -1,8 +1,6 @@
 import { Octokit } from "@octokit/rest";
 // import { Octokit } from "@octokit/rest";
 
-const secoctokit = new Octokit()
-
 const octokit = new Octokit({
     auth: import.meta.env.GITHUB_TOKEN
 })
@@ -55,28 +53,30 @@ export const fetchPerPageRepo = async (page, username) => {
 
 // search language repo
 export const searchRepoLanguage = async (repoName) => {
-    const response = await octokit.request("GET /repos/{owner}/{repo}/languages",{
-        owner:"saurabhkumar96",
-        repo:repoName
-    })
-    console.log(response)
+    const response = await octokit.rest.repos.listLanguages({
+        owner: "saurabhkumar96",
+        repo: repoName,
+    });
+    return response
 }
 
 
-export async function searchRepositories(language) {
-  try {
-    const response = await octokit.rest.search.repos({
-      // "q" contains your search terms and qualifiers like "language"
-      q: `language:${language}`, 
-      sort: "stars",
-      order: "desc",
-    });
-    console.log(`Found ${response.data.total_count} repositories.`);
-    
-    response.data.items.forEach(repo => {
-      console.log(`${repo.full_name} - ⭐ ${repo.stargazers_count}`);
-    });
-  } catch (error) {
-    console.error(`Error: ${error.message}`);
-  }
+
+export async function searchRepositoriesLanguage(language) {
+    try {
+        const response = await octokit.rest.search.repos({
+            // "q" contains your search terms and qualifiers like "language"
+            q: `language:${language}`,
+            sort: "stars",
+            order: "desc",
+        });
+        console.log(`Found ${response.data.total_count} repositories.`);
+
+        return response.data.items.map(repo => {
+            // console.log(`${repo.full_name} - ⭐ ${repo.stargazers_count}`);
+            return repo.full_name
+        });
+    } catch (error) {
+        console.error(`Error: ${error.message}`);
+    }
 }

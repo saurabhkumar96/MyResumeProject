@@ -65,11 +65,6 @@ const Hero = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        console.log({
-            username,
-            search,
-        });
-
         let isMounted = true;
 
         const fetchRepositories = async () => {
@@ -194,7 +189,6 @@ const Hero = () => {
                                     <tr key={`${repo}-${index}`}>
                                         <td className="border border-gray-400 px-4 py-2">
                                             <Link to={`/repository/${repo}`}>{repo}</Link>
-                                            {console.log(repo)}
 
                                         </td>
                                     </tr>
