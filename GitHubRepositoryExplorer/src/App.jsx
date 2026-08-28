@@ -2,19 +2,20 @@ import { Route, Routes } from "react-router"
 import Home from "./pages/Home"
 import { useEffect } from "react"
 import RepositoryDetail from "./components/RepositoryDetail"
-import { totalLanguage } from "./hooks/findAllLanguages"
-import { searchRepoLanguage } from "./services/githubapi"
+import Pop from "./pages/Pop"
+
 
 const App = () => {
-  useEffect(async ()=>{
-    const res = await searchRepoLanguage("MyResumeProject")
-    console.log(data.data)
-  },[])
+  // useEffect(async ()=>{
+
+  // },[])
   return (
     <>
       <Routes>
         <Route index element={<Home />}/>
-        <Route path="repository/:ropoID" element={<RepositoryDetail />} />
+        <Route path="repository/:repoID" element={<RepositoryDetail />} />
+        <Route path="/el" element={<Pop />} />
+        
       </Routes>
     </>
   )

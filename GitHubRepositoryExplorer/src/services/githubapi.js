@@ -1,9 +1,9 @@
 import { Octokit } from "@octokit/rest";
 // import { Octokit } from "@octokit/rest";
 
-const octokit = new Octokit({
-    auth: import.meta.env.GITHUB_TOKEN
-})
+// const octokit = new Octokit({
+//     auth: import.meta.env.GITHUB_TOKEN
+// })
 
 
 export async function checkRateLimit() {
@@ -19,7 +19,7 @@ export const languageUse = async () => {
             owner: "saurabhkumar96",
             repo: "mini_project",
         });
-        // console.log(result)
+        console.log(result)
     } catch (error) {
         console.log(`Error! Status: ${error.status}. Message: ${error.response.data.message}`)
     }
@@ -57,7 +57,7 @@ export const searchRepoLanguage = async (repoName) => {
         owner: "saurabhkumar96",
         repo: repoName,
     });
-    return response
+    return response.data
 }
 
 
