@@ -1,9 +1,9 @@
 import { Octokit } from "@octokit/rest";
 // import { Octokit } from "@octokit/rest";
 
-// const octokit = new Octokit({
-//     auth: import.meta.env.GITHUB_TOKEN
-// })
+const octokit = new Octokit({
+    auth: import.meta.env.GITHUB_TOKEN
+})
 
 
 export async function checkRateLimit() {
@@ -28,13 +28,30 @@ export const languageUse = async () => {
 // not using this function 
 export const showAllRepo = async () => {
     try {
-
         const result = await octokit.request("GET /users/{username}/repos", {
             username: "saurabhkumar96",
         })
         return result.data
     } catch (error) {
-        console.log(`Error! Status: ${error.status}. Message: ${error.response.data.message}`)
+        console.log(`Error! Status: ${error.status}`)
+    }
+}
+/*
+    I am using this for find the languages use by all repo
+*/
+export const showAllRepoLanugage = async ()=>{
+    try {
+        let repoNames = await showAllRepo()
+        let repoLanguageArray = []
+        for(let i=0; i<repoNames.length; i++){
+            const name = repoNames[i]
+            const res = await searchRepoLanguage(name)
+            let languageKey = Object.keys(res)
+            repoLanguageArray.push(...languageKey)
+        }
+        console.log(repoLanguageArray)
+    } catch (error) {  
+        console.log(`something is error -> ${error.message}`)
     }
 }
 
