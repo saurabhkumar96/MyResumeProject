@@ -2,14 +2,9 @@ import { Octokit } from "@octokit/rest";
 // import { Octokit } from "@octokit/rest";
 
 const octokit = new Octokit({
-    auth: import.meta.env.GITHUB_TOKEN
+    // auth: import.meta.env.VITE_GITHUB_TOKEN
 })
 
-
-export async function checkRateLimit() {
-    const { data } = await octokit.rateLimit.get();
-    console.log(data.rate);
-}
 
 
 
@@ -34,6 +29,7 @@ export const showAllRepo = async () => {
         return result.data
     } catch (error) {
         console.log(`Error! Status: ${error.status}`)
+        return []
     }
 }
 /*
@@ -44,14 +40,18 @@ export const showAllRepoLanugage = async ()=>{
         let repoNames = await showAllRepo()
         let repoLanguageArray = []
         for(let i=0; i<repoNames.length; i++){
-            const name = repoNames[i]
+            await waitForRateLimit()
+            const name = repoNames[i].name
             const res = await searchRepoLanguage(name)
             let languageKey = Object.keys(res)
             repoLanguageArray.push(...languageKey)
         }
-        console.log(repoLanguageArray)
+        const languageSet = new Set(repoLanguageArray)
+        console.log(languageSet)
+        return languageSet
     } catch (error) {  
         console.log(`something is error -> ${error.message}`)
+        return new Set()
     }
 }
 
@@ -70,11 +70,16 @@ export const fetchPerPageRepo = async (page, username) => {
 
 // search language repo
 export const searchRepoLanguage = async (repoName) => {
-    const response = await octokit.rest.repos.listLanguages({
-        owner: "saurabhkumar96",
-        repo: repoName,
-    });
-    return response.data
+    try {
+        const result = await octokit.request("GET /users/{username}/repos", {
+            username: "saurabhkumar96",
+        });
+
+        return result.data;
+    } catch (error) {
+        console.error(`Error! Status: ${error.status}`);
+        return [];
+    }
 }
 
 
@@ -97,3 +102,24 @@ export async function searchRepositoriesLanguage(language) {
         console.error(`Error: ${error.message}`);
     }
 }
+
+const waitForRateLimit = async () => {
+    const { data } = await octokit.rateLimit.get();
+
+    const remaining = data.rate.remaining;
+    const resetTime = data.rate.reset * 1000;
+
+    console.log("Remaining requests:", remaining);
+
+    if (remaining <= 1) {
+        const waitTime = resetTime - Date.now();
+
+        console.log(
+            `Rate limit reached. Waiting ${Math.ceil(waitTime / 1000)} seconds...`
+        );
+
+        await new Promise((resolve) =>
+            setTimeout(resolve, waitTime + 1000)
+        );
+    }
+};

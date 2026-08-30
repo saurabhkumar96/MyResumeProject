@@ -3,7 +3,7 @@ import Home from "./pages/Home"
 import { useEffect } from "react"
 import RepositoryDetail from "./components/RepositoryDetail"
 import Pop from "./pages/Pop"
-import { showAllRepoLanugage,searchRepoLanguage } from "./services/githubapi"
+import { showAllRepoLanugage } from "./services/githubapi"
 
 
 const App = () => {
