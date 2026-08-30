@@ -1,20 +1,20 @@
 import React, { useEffect } from 'react'
 import { Route, Routes } from 'react-router'
 import AdminPage from './pages/AdminPage'
-import { postDetail } from './services/jsonPlaceholderapi'
 import ActionPage from './pages/ActionPage'
 import Toastify from './components/Toastify'
+import { showSinglePost } from './services/jsonPlaceholderapi'
+import AllPosts from './components/AllPosts'
 
 const App = () => {
-  useEffect(()=>{
-    // postDetail()
-  },[])
+    // some
   return (
     <>
     <Toastify />
     <Routes>
       <Route index element={<AdminPage />} />
       <Route path='posts/:id' element={<ActionPage />} />
+      <Route path='/allpost' element={<AllPosts />} />
     </Routes>
     </>
   )

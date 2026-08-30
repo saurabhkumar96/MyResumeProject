@@ -1,6 +1,6 @@
 import React from 'react'
 
-const SortSelect = ({ sortBy, setSortBy, sortOrder, setSortOrder }) => {
+const showAllPost = ({ sortBy, setSortBy, sortOrder, setSortOrder }) => {
   const handleSortOrder = () => {
     setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'))
   }
@@ -26,4 +26,4 @@ const SortSelect = ({ sortBy, setSortBy, sortOrder, setSortOrder }) => {
   )
 }
 
-export default SortSelect
+export default showAllPost

@@ -1,13 +1,14 @@
-import { Octokit } from "@octokit/rest";
+import { Octokit } from "octokit";
 // import { Octokit } from "@octokit/rest";
 
+
 const octokit = new Octokit({
-    // auth: import.meta.env.VITE_GITHUB_TOKEN
+    auth: import.meta.env.VITE_GITHUB_TOKEN
 })
 
 
 
-
+// not using this function
 export const languageUse = async () => {
     try {
         const result = await octokit.request("GET /repos/{owner}/{repo}", {
@@ -20,7 +21,7 @@ export const languageUse = async () => {
     }
 }
 
-// not using this function 
+
 export const showAllRepo = async () => {
     try {
         const result = await octokit.request("GET /users/{username}/repos", {
@@ -39,8 +40,8 @@ export const showAllRepoLanugage = async ()=>{
     try {
         let repoNames = await showAllRepo()
         let repoLanguageArray = []
+        await waitForRateLimit()
         for(let i=0; i<repoNames.length; i++){
-            await waitForRateLimit()
             const name = repoNames[i].name
             const res = await searchRepoLanguage(name)
             let languageKey = Object.keys(res)
@@ -71,14 +72,15 @@ export const fetchPerPageRepo = async (page, username) => {
 // search language repo
 export const searchRepoLanguage = async (repoName) => {
     try {
-        const result = await octokit.request("GET /users/{username}/repos", {
+        const result = await octokit.request("GET /repos/{owner}/{repo}/languages", {
             username: "saurabhkumar96",
+            repo: repoName,
         });
 
         return result.data;
     } catch (error) {
         console.error(`Error! Status: ${error.status}`);
-        return [];
+        return {};
     }
 }
 

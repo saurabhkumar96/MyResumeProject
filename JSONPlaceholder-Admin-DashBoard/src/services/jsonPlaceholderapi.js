@@ -13,19 +13,33 @@ export const allUsers = async ()=>{
     }
 }
 
-export const postDetail = async ()=>{
-    try {
-        const response = await api.get("/posts")
-        return response
-    } catch (error) {
-        
-    }
-}
+
 export const commentDetail = async ()=>{
     try {
         const response = await api.get("/comments")
         return response
     } catch (error) {
-        
+        console.log(`something is error -> ${error.message}`)
     }
 }
+
+export const showAllPost = async ()=>{
+    try {
+        const response = await api.get("/posts")
+        return response
+    } catch (error) {
+        console.log(`something is error -> ${error.message}`)
+    }
+}
+
+
+export const showSinglePost = async (id)=>{
+    try {
+        const response = await api.get(`/posts/${id}`)
+        return response
+    } catch (error) {
+        console.log(`something is error -> ${error.message}`)
+    }
+}
+
+

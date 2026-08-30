@@ -1,5 +1,5 @@
 import { useParams } from "react-router";
-import { searchRepoLanguage, searchRepositoriesLanguage } from "../services/githubapi";
+import { searchRepoLanguage } from "../services/githubapi";
 import { useEffect, useState } from "react";
 
 
