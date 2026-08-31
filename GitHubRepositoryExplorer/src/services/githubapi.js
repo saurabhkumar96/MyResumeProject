@@ -2,6 +2,7 @@ import { Octokit } from "octokit";
 
 
 
+
 const octokit = new Octokit({
     // auth: import.meta.env.VITE_GITHUB_TOKEN
 })
@@ -40,11 +41,11 @@ export const showAllRepo = async () => {
 export const showAllRepoLanugage = async () => {
     try {
         let repos = await showAllRepo()
-        const allLanguage = repos.map((repo)=> repo.language)
-        const language = allLanguage.filter((item,index,array)=> array.indexOf(item)=== index)
+        const allLanguage = repos.map((repo) => repo.language)
+        const language = allLanguage.filter((item, index, array) => array.indexOf(item) === index)
         let withoutnullLanguage = []
         for (const element of language) {
-            if(element!= null){
+            if (element != null) {
                 withoutnullLanguage.push(element)
             }
         }
@@ -70,7 +71,7 @@ export const fetchPerPageRepo = async (page, username) => {
 }
 
 // search language repo
-export const searchRepoLanguage = async (owner,repoName) => {
+export const searchRepoLanguage = async (owner, repoName) => {
     try {
         const result = await octokit.request("GET /repos/{owner}/{repo}/languages", {
             owner: owner,
@@ -88,7 +89,7 @@ export const searchRepoLanguage = async (owner,repoName) => {
 
 export async function searchRepositoriesLanguage(language) {
     try {
-        const response = await octokit.rest.search.repos({
+        const response = await octokit.search.repos({
             // "q" contains your search terms and qualifiers like "language"
             q: `language:${language}`,
             sort: "stars",
@@ -96,17 +97,37 @@ export async function searchRepositoriesLanguage(language) {
         });
         console.log(`Found ${response.data.total_count} repositories.`);
 
-        return response.data.items.map(repo => {
-            // console.log(`${repo.full_name} - ⭐ ${repo.stargazers_count}`);
+        const repos = response.data.items.map(repo => {
+            console.log(`${repo.full_name} - ⭐ ${repo.stargazers_count}`);
             return repo.full_name
         });
+        console.log(repos)
     } catch (error) {
         console.error(`Error: ${error.message}`);
     }
 }
 
+
+    export async function getAllCommits(owner, repo) {
+    try {
+        // octokit.paginate automatically requests all pages until no more items are found
+        const allCommits = await octokit.paginate(octokit.rest.repos.listCommits, {
+            owner: owner,
+            repo: repo,
+            per_page: 100, // Maximizes performance by pulling 100 items per request
+        });
+
+        // console.log(`Total commits fetched: ${allCommits.length}`);
+        // console.log(allCommits[0].commit.message)
+        // console.log(allCommits)
+        return allCommits;
+    } catch (error) {
+        console.error("Error fetching commits:", error);
+    }
+}
+
 // export const waitForRateLimit = async () => {
-//     const { data } = await 
+//     const { data } = await
 
 //     const remaining = data.rate.remaining;
 //     const resetTime = data.rate.reset * 1000;

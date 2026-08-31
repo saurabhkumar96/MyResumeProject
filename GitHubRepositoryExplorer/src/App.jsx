@@ -3,13 +3,14 @@ import Home from "./pages/Home"
 import { useEffect } from "react"
 import RepositoryDetail from "./components/RepositoryDetail"
 import Pop from "./pages/Pop"
-import { searchRepoLanguage } from "./services/githubapi"
+import { getAllCommits } from "./services/githubapi"
+import { userAndCommits } from "./hooks/useFetch"
 
 
 const App = () => {
   useEffect(()=>{
-        const owner = localStorage.getItem("githubUsername")
-        searchRepoLanguage(owner,"ellocent_labs")
+    // userAndCommits()
+    // getAllCommits()
   },[])
   return (
     <>
