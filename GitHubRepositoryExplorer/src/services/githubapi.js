@@ -1,9 +1,9 @@
 import { Octokit } from "octokit";
-// import { Octokit } from "@octokit/rest";
+
 
 
 const octokit = new Octokit({
-    auth: import.meta.env.VITE_GITHUB_TOKEN
+    // auth: import.meta.env.VITE_GITHUB_TOKEN
 })
 
 
@@ -33,24 +33,24 @@ export const showAllRepo = async () => {
         return []
     }
 }
+
 /*
     I am using this for find the languages use by all repo
 */
-export const showAllRepoLanugage = async ()=>{
+export const showAllRepoLanugage = async () => {
     try {
-        let repoNames = await showAllRepo()
-        let repoLanguageArray = []
-        await waitForRateLimit()
-        for(let i=0; i<repoNames.length; i++){
-            const name = repoNames[i].name
-            const res = await searchRepoLanguage(name)
-            let languageKey = Object.keys(res)
-            repoLanguageArray.push(...languageKey)
+        let repos = await showAllRepo()
+        const allLanguage = repos.map((repo)=> repo.language)
+        const language = allLanguage.filter((item,index,array)=> array.indexOf(item)=== index)
+        let withoutnullLanguage = []
+        for (const element of language) {
+            if(element!= null){
+                withoutnullLanguage.push(element)
+            }
         }
-        const languageSet = new Set(repoLanguageArray)
-        console.log(languageSet)
-        return languageSet
-    } catch (error) {  
+        // console.log(withoutnullLanguage)
+        return withoutnullLanguage
+    } catch (error) {
         console.log(`something is error -> ${error.message}`)
         return new Set()
     }
@@ -70,13 +70,13 @@ export const fetchPerPageRepo = async (page, username) => {
 }
 
 // search language repo
-export const searchRepoLanguage = async (repoName) => {
+export const searchRepoLanguage = async (owner,repoName) => {
     try {
         const result = await octokit.request("GET /repos/{owner}/{repo}/languages", {
-            username: "saurabhkumar96",
+            owner: owner,
             repo: repoName,
         });
-
+        // console.log(result.data)
         return result.data;
     } catch (error) {
         console.error(`Error! Status: ${error.status}`);
@@ -105,23 +105,23 @@ export async function searchRepositoriesLanguage(language) {
     }
 }
 
-const waitForRateLimit = async () => {
-    const { data } = await octokit.rateLimit.get();
+// export const waitForRateLimit = async () => {
+//     const { data } = await 
 
-    const remaining = data.rate.remaining;
-    const resetTime = data.rate.reset * 1000;
+//     const remaining = data.rate.remaining;
+//     const resetTime = data.rate.reset * 1000;
 
-    console.log("Remaining requests:", remaining);
+//     console.log("Remaining requests:", remaining);
 
-    if (remaining <= 1) {
-        const waitTime = resetTime - Date.now();
+//     if (remaining <= 1) {
+//         const waitTime = resetTime - Date.now();
 
-        console.log(
-            `Rate limit reached. Waiting ${Math.ceil(waitTime / 1000)} seconds...`
-        );
+//         console.log(
+//             `Rate limit reached. Waiting ${Math.ceil(waitTime / 1000)} seconds...`
+//         );
 
-        await new Promise((resolve) =>
-            setTimeout(resolve, waitTime + 1000)
-        );
-    }
-};
+//         await new Promise((resolve) =>
+//             setTimeout(resolve, waitTime + 1000)
+//         );
+//     }
+// };

@@ -3,20 +3,19 @@ import Home from "./pages/Home"
 import { useEffect } from "react"
 import RepositoryDetail from "./components/RepositoryDetail"
 import Pop from "./pages/Pop"
-import { showAllRepoLanugage } from "./services/githubapi"
+import { searchRepoLanguage } from "./services/githubapi"
 
 
 const App = () => {
-
-  
   useEffect(()=>{
-    showAllRepoLanugage()
+        const owner = localStorage.getItem("githubUsername")
+        searchRepoLanguage(owner,"ellocent_labs")
   },[])
   return (
     <>
       <Routes>
         <Route index element={<Home />}/>
-        <Route path="repository/:repoID" element={<RepositoryDetail />} />
+        <Route path="repository/:repoLanguage" element={<RepositoryDetail />} />
         <Route path="/temp" element={<Pop />} />
         
       </Routes>

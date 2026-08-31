@@ -4,6 +4,7 @@ import Button from '@mui/material/Button';
 import { useEffect, useRef, useState } from 'react';
 import { useGithubApi } from '../hooks/useFetch';
 import { Link } from 'react-router';
+import { showAllRepoLanugage } from '../services/githubapi';
 
 
 const Hero = () => {
@@ -15,6 +16,7 @@ const Hero = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
     const [current, setCurrent] = useState(1);
+    const [allLanugage, setAllLanguage] = useState([])
 
 
     useEffect(() => {
@@ -53,10 +55,18 @@ const Hero = () => {
 
 
     }, [current]);
-    
+
     useEffect(() => {
         localStorage.setItem('githubUsername', username);
     }, [username]);
+
+    useEffect(() => {
+        showAllRepoLanugage()
+            .then((res) => {
+                setAllLanguage(res)
+            })
+            .catch((err) => console.log(`something is error - ${err.message}`))
+    }, [])
 
     const filteredRepos = repoNames.filter((repo) =>
         String(repo).toLowerCase().includes(search.toLowerCase())
@@ -173,35 +183,44 @@ const Hero = () => {
                     Loading repositories...
                 </p>
             ) : (
-                <div className="flex justify-center">
-                    <table className="border-collapse border border-gray-400">
-                        <thead>
-                            <tr>
-                                <th className="border border-gray-400 px-4 py-2">
-                                    Repository Name
-                                </th>
-                            </tr>
-                        </thead>
+                <div>
+                    <div className="flex justify-center gap-5">
+                        <table className="border-collapse border border-gray-400">
+                            <thead>
+                                <tr>
+                                    <th className="border border-gray-400 px-4 py-2">
+                                        Repository Name
+                                    </th>
+                                </tr>
+                            </thead>
 
-                        <tbody>
-                            {filteredRepos.length > 0 ? (
-                                filteredRepos.map((repo, index) => (
-                                    <tr key={`${repo}-${index}`}>
+                            <tbody>
+                                {filteredRepos.length > 0 ? (
+                                    filteredRepos.map((repo, index) => (
+                                        <tr key={`${repo}-${index}`}>
+                                            <td className="border border-gray-400 px-4 py-2">
+                                                <Link to={`/repository/${repo}`}>{repo}</Link>
+
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
                                         <td className="border border-gray-400 px-4 py-2">
-                                            <Link to={`/repository/${repo}`}>{repo}</Link>
-
+                                            No repositories found
                                         </td>
                                     </tr>
+                                )}
+                            </tbody>
+                        </table>
+                        <div>
+                            {
+                                allLanugage.map((lanuguage) => (
+                                    <div>{lanuguage}</div>
                                 ))
-                            ) : (
-                                <tr>
-                                    <td className="border border-gray-400 px-4 py-2">
-                                        No repositories found
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
+                            }
+                        </div>
+                    </div>
                 </div>
             )}
         </div>
