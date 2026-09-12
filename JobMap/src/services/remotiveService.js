@@ -10,5 +10,7 @@ const api = axios.create({
 
 export async function allRemoteJobs() {
   const response = await api.get("")
-  return response.data
+  console.log(response.data)
+  console.log(response.data.jobs[0].url)
+  // return response
 }

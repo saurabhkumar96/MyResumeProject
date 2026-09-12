@@ -1,12 +1,20 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { useFindJob } from '../hooks/useFindJob'
 
 const Test = () => {
-    const {jobs} = useFindJob()
-    console.log(jobs)
-    return (
-        <div>Test</div>
-    )
+    const {caterogy} = useFindJob()
+  return (
+    <div>
+        {caterogy.map((res)=> {
+            return(
+                <div>{res}</div>
+            )
+        })}
+        <br />
+        <br />
+        <hr />
+    </div>
+  )
 }
 
 export default Test
