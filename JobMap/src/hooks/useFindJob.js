@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { allRemoteJobs } from "../services/remotiveService";
 
 
-export function useFindJob(){
-    
+export function useFindJob() {
+
     // const [jobs,setJobs] = useState([])
     // useEffect(()=>{ 
     //     const fetchJobs = async ()=>{
@@ -18,18 +18,42 @@ export function useFindJob(){
     // },[])
     // return {jobs};
 
+    const [loading, setLoading] = useState(true)
+    const [listofjob,setListofjob] = useState([])
     const [caterogy, setCaterogy] = useState([])
-    useEffect(()=>{
-        const fetchCategory = async()=>{
+    useEffect(() => {
+        const fetchCategory = async () => {
             try {
-                const response = await allRemoteJobs()
-                const data = response.data.jobs.map((res)=> res.category)
-                setCaterogy(data)
+                if (loading) {
+                    const response = await allRemoteJobs()
+                    const data = response.data.jobs.map((res) => res.category)
+                    setCaterogy(data)
+                }
             } catch (err) {
-                console.log("something is error",err)
+                console.log("something is error", err)
+            } finally {
+                setLoading(false)
             }
         }
         fetchCategory()
-    },[])
-    return {caterogy}
+    }, [])
+
+    useEffect(()=>{
+        const fetchListOfJobs = async ()=> {
+            try {
+                if(loading){
+                    const response = await allRemoteJobs()
+                    console.log(response.data.jobs)
+                    setListofjob(response.data.jobs)
+                }
+            } catch (error) {
+                console.log("something is error in the",error)
+            } finally {
+                setLoading(false)
+            }
+        }
+        fetchListOfJobs()
+    }, [])
+
+    return { caterogy,loading,listofjob }
 }
