@@ -21,6 +21,9 @@ const Home = () => {
 
   return (
     <main>
+        <div>
+            
+        </div>
         <div id='left'>
             <textarea name="jobDescription" id="jobDescription" placeholder='jobDescription'></textarea>
         </div>

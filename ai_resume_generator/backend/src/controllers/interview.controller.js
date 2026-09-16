@@ -1,5 +1,5 @@
 const {PDFParse} = require("pdf-parse")
-const { generateInterviewReport, generateResumePdf } = require("../services/genAI.service")
+const { generateInterviewReport, generateResumePdf } = require("../services/genAI.service.mjs")
 const interviewReportModel = require("../models/interviewReport.model")
 
 

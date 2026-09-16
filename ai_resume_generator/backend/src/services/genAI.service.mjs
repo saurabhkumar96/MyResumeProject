@@ -1,7 +1,8 @@
-const { GoogleGenAI } = require("@google/genai")
-const { z } = require("zod")
-const { zodToJsonSchema } = require("zod-to-json-schema")
-const puppeteer = require("puppeteer")
+import { GoogleGenAI } from "@google/genai";
+import {z} from "zod"
+import {zodToJsonSchema} from "zod-to-json-schema"
+import puppeteer from "puppeteer";
+import "dotenv/config"
 
 const ai = new GoogleGenAI({
     apiKey: process.env.GOOGLE_GENAI_API_KEY
@@ -40,15 +41,24 @@ async function generateInterviewReport({ resume, selfDescription, jobDescription
                         Self Description: ${selfDescription}
                         Job Description: ${jobDescription}
 `
+// depricated
+    // const response = await ai.models.generateContent({
+    //     model: "gemini-3-flash-preview",
+    //     contents: prompt,
+    //     config: {
+    //         responseMimeType: "application/json",
+    //         responseSchema: zodToJsonSchema(interviewReportSchema),
+    //     }
+    // })
+    const response = await ai.interactions.create({
+    model: "gemini-3.8-flash",
+    contents: prompt,
+    config: {
+        responseMimeType: "application/json",
+        responseSchema: zodToJsonSchema(interviewReportSchema)
+    }
+  });
 
-    const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
-        contents: prompt,
-        config: {
-            responseMimeType: "application/json",
-            responseSchema: zodToJsonSchema(interviewReportSchema),
-        }
-    })
 
     return JSON.parse(response.text)
 
@@ -113,4 +123,4 @@ async function generateResumePdf({ resume, selfDescription, jobDescription }) {
 
 }
 
-module.exports = { generateInterviewReport, generateResumePdf }
+export { generateInterviewReport, generateResumePdf }
